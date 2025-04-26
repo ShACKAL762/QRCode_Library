@@ -2,11 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.devtoolsKsp)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.example.qrcodebank"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.qrcodebank"
@@ -51,11 +52,20 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.video)
+    implementation(libs.androidx.camera.extensions)
     implementation(libs.koin.android)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation (libs.androidx.runtime.livedata)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.play.services.mlkit.barcode.scanning)
+    implementation(libs.androidx.camera.mlkit.vision)
     annotationProcessor(libs.androidx.room.room.compiler)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
