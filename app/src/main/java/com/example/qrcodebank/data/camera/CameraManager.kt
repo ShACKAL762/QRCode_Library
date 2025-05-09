@@ -1,28 +1,34 @@
-package com.example.qrcodebank.ui.camera.viewModel
+package com.example.qrcodebank.data.camera
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.example.qrcodebank.ui.camera.viewModel.MyCallback
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
-import java.util.concurrent.Executor
 
 
 fun startCamera(
-    cameraProvider: ProcessCameraProvider,
+    context: Context,
     lifecycleOwner: LifecycleOwner,
     previewUseCase: Preview,
-    executor: Executor,
-    context: Context
+    result: MyCallback
 ) {
+
+    val cameraProviderFuture =
+        ProcessCameraProvider.getInstance(context)
+    val cameraProvider =
+        cameraProviderFuture.get()
+    val executor = ContextCompat.getMainExecutor(context)
+
     //Test сканирования qrCode
     //Настройка настроек сканера
     val options = BarcodeScannerOptions.Builder()
@@ -34,17 +40,12 @@ fun startCamera(
     val imageAnalysis = ImageAnalysis.Builder()
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
-        .also {
-            it.setAnalyzer(
-                executor
-            ) { image: ImageProxy ->
-                processImageProxy(barcodeScanner, image) { result ->
-                    cameraProvider.unbindAll()
-                Toast.makeText(context,result,Toast.LENGTH_LONG).show()
-                }
-            }
-        }
 
+    imageAnalysis.setAnalyzer(
+        executor
+    ) { image: ImageProxy ->
+        processImageProxy(barcodeScanner, image,context,result)
+    }
 
     try {
         cameraProvider.unbindAll()
@@ -58,6 +59,7 @@ fun startCamera(
     } catch (ex: Exception) {
         Log.e("CameraPreview", "Use case binding failed", ex)
     }
+
 
 }
 

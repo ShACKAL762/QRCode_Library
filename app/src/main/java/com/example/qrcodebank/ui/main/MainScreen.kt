@@ -35,25 +35,35 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import com.example.qrcodebank.R
+import com.example.qrcodebank.Route
+import com.example.qrcodebank.ui.camera.CameraScreen
+import com.example.qrcodebank.Navigation
+import org.koin.androidx.compose.koinViewModel
 
-class MainScreen(val viewModel: MainViewModel) {
+class MainScreen {
 
     lateinit var context: Context
-    lateinit var activity: Activity
     lateinit var lifeCycle: LifecycleOwner
-
+    lateinit var navController: NavController
     @Composable
-    fun MyScaffold() {
+    fun Main(){
+        navController = Navigation().getNavController(this)
         context = LocalContext.current
-        activity = LocalActivity.current!!
         lifeCycle = LocalLifecycleOwner.current
+
+    }
+    @Composable
+    fun LibraryScreen(viewModel: MainViewModel = koinViewModel()) {
+
         Scaffold(
             topBar = { Title() },
             floatingActionButton = { ActionButton() },
@@ -112,7 +122,7 @@ class MainScreen(val viewModel: MainViewModel) {
 fun ActionButton() {
     val context = LocalContext.current
     SmallFloatingActionButton(
-        onClick = { addQrCode(context) },
+        onClick = { addQrCode(navController) },
         shape = CircleShape,
         containerColor = colorResource(R.color.background),
         modifier = Modifier
@@ -137,8 +147,8 @@ fun ActionButton() {
         }
     }
 }
-
-    private fun addQrCode(context: Context) {
+    private fun addQrCode(navController: NavController) {
+        navController.navigate(Route.Camera.route)
 
     }
 
